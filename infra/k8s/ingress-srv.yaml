@@ -10,14 +10,14 @@ spec:
     - host: order.dev
       http:
         paths:
-          - path: /v1/api/orders/?(.*)
+          - path: /v1/orders/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: order-srv
                 port:
                   number: 3000
-          - path: /v1/api/payments/?(.*)
+          - path: /v1/payments/?(.*)
             pathType: Prefix
             backend:
               service:
