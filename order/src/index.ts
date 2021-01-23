@@ -2,6 +2,7 @@ import { json } from 'body-parser';
 import express from 'express';
 import routes from './routes';
 import mongoose from 'mongoose';
+import { stan } from './nats-client';
 
 const app = express();
 app.use(json());
@@ -9,6 +10,10 @@ app.use(routes);
 
 const start = async () => {
   try {
+    stan.on('connect', async () => {
+      console.log('Publisher connected to NATS');
+    });
+
     await mongoose.connect('mongodb://order-mongo-srv:27017/order', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
