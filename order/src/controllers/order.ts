@@ -3,11 +3,12 @@ import { Order } from '../models/order';
 import { validationResult } from 'express-validator';
 import { STATUS } from '../middleware/constant';
 import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
-import { OrderStatus } from '../events/types/order-status'
+import { OrderStatus } from '../events/types/order-status';
 import { stan } from '../nats-client';
+import { randomBytes } from 'crypto';
 
 export const addOrder = async (req: Request, res: Response) => {
-  const { state, amount, customerId } = req.body;
+  const { status, amount, customerId } = req.body;
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -17,17 +18,18 @@ export const addOrder = async (req: Request, res: Response) => {
   }
 
   try {
-    const order = Order.build({state, amount, customerId});
+    const order = Order.build({status, amount, customerId});
     await order.save();
 
     const publisher = new OrderCreatedPublisher(stan);
     publisher.publish({
       id: order._id,
-      state: OrderStatus.Created,
+      status: OrderStatus.Created,
       amount: order.amount,
       customerId: order.customerId,
       createdDate: order.createdDate,
-      updatedDate: order.updatedDate
+      updatedDate: order.updatedDate,
+      token: randomBytes(48).toString('hex')
     });
 
     res.status(201).send(order);
@@ -43,7 +45,7 @@ export const getOrderStatus = async (req: Request, res: Response) => {
   const orderId = req.params.orderId;
   try {
     const orderStatus = await Order.findById(orderId)
-    .select('-_id state');
+    .select('-_id status');
     res.status(200).send({
       data: orderStatus
     });
@@ -59,7 +61,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
 
   try {
     const order = await Order.findById(orderId);
-    order!.state = STATUS.cancelled;
+    order!.status = STATUS.cancelled;
     order!.updatedDate = new Date().toLocaleString();
     const updatedOrder = await order!.save();
     res.status(200).send({

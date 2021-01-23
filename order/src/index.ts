@@ -3,6 +3,7 @@ import express from 'express';
 import routes from './routes';
 import mongoose from 'mongoose';
 import { stan } from './nats-client';
+import { PaymentProcessedListener } from './events/listeners/payment-processed-listener'
 
 const app = express();
 app.use(json());
@@ -12,6 +13,7 @@ const start = async () => {
   try {
     stan.on('connect', async () => {
       console.log('Publisher connected to NATS');
+      new PaymentProcessedListener(stan).listen();
     });
 
     await mongoose.connect('mongodb://order-mongo-srv:27017/order', {

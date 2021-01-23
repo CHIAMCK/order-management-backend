@@ -3,11 +3,9 @@ import { STATE } from './constant';
 
 export let orderPayloadValidators =  [
   body('amount')
-  .isDecimal({
-    decimal_digits: '2'
-  })
+  .matches(/^\d+(?:\.\d{0,2})$/)
   .withMessage('Please enter a valid amount.'),
-  body('state')
+  body('status')
   .isIn(STATE)
   .withMessage('Please enter a valid state.'),
   body('customerId')

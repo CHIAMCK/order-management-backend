@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 interface OrderAttrs {
-  state: string;
+  status: string;
   amount: number;
   customerId: number;
 }
@@ -11,7 +11,7 @@ interface OrderModel extends mongoose.Model<OrderDoc> {
 }
 
 interface OrderDoc extends mongoose.Document {
-  state: string;
+  status: string;
   amount: number;
   customerId: number;
   createdDate: string;
@@ -19,7 +19,7 @@ interface OrderDoc extends mongoose.Document {
 }
 
 const orderSchema = new mongoose.Schema({
-  state: {
+  status: {
     type: String,
     enum: ['created', 'confirmed', 'delivered', 'cancelled'],
     default: 'created',
@@ -47,15 +47,5 @@ orderSchema.statics.build = (attrs: OrderAttrs) => {
 };
 
 const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
-
-// const order = Order.build({
-//   state: State.created,
-//   amount: 19.00,
-//   createdDate: "2020-01-01",
-//   updatedDate: "2020-01-01",
-//   customerId: 3
-// });
-
-// const date = order.updatedDate;
 
 export { Order };

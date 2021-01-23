@@ -8,7 +8,7 @@ router.post(
   orderPayloadValidators,
   addOrder
 );
-router.get('/:orderId', getOrderStatus);
+router.get('/:orderId/status', getOrderStatus);
 router.post('/cancel/:orderId', cancelOrder);
 
 export default router;
