@@ -1,11 +1,10 @@
 import express from 'express';
-import { orderPayloadValidators } from '../middleware/payloadValidator';
 const router = express.Router();
 
-router.get(
-  '/current',
+router.post(
+  '',
   (req ,res) => {
-    res.send('Hi there !!!!');
+    res.send('Payment service !!!!');
   }
 );
 
